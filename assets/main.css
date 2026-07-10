@@ -2027,3 +2027,8 @@ body.modal-open { overflow: hidden; }
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 .weavr-tooltip[hidden] { display: none; }
+.token-stat-tip {
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  cursor: default;
+}

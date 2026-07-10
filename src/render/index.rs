@@ -16,6 +16,10 @@ pub struct IndexContext {
     pub total_sessions: u32,
     pub total_messages: u32,
     pub total_tokens_display: String,
+    pub total_input_tokens_display: String,
+    pub total_output_tokens_display: String,
+    pub total_cache_read_display: String,
+    pub total_cache_write_display: String,
     pub date_range: String,
     pub projects: Vec<ProjectCard>,
 }
@@ -32,12 +36,21 @@ pub struct ProjectCard {
     pub last_activity_display: String,
 }
 
+/// Aggregate token counts across all projects.
+pub struct TokenTotals {
+    pub total: u64,
+    pub input: u64,
+    pub output: u64,
+    pub cache_creation: u64,
+    pub cache_read: u64,
+}
+
 /// Build an [`IndexContext`] from cached project metadata.
 pub fn build_context(
     css: String,
     projects: Vec<super::IndexProjectData>,
     total_messages: u32,
-    total_tokens: u64,
+    tokens: TokenTotals,
     earliest: Option<String>,
     latest: Option<String>,
 ) -> IndexContext {
@@ -75,7 +88,11 @@ pub fn build_context(
         total_projects,
         total_sessions: project_cards.iter().map(|p| p.session_count).sum(),
         total_messages,
-        total_tokens_display: format_token_count(total_tokens),
+        total_tokens_display: format_token_count(tokens.total),
+        total_input_tokens_display: format_token_count(tokens.input),
+        total_output_tokens_display: format_token_count(tokens.output),
+        total_cache_read_display: format_token_count(tokens.cache_read),
+        total_cache_write_display: format_token_count(tokens.cache_creation),
         date_range,
         projects: project_cards,
     }
@@ -125,7 +142,13 @@ mod tests {
                 last_activity: Some("2025-06-15T12:00:00Z".into()),
             }],
             45,
-            15000,
+            TokenTotals {
+                total: 15000,
+                input: 5000,
+                output: 3000,
+                cache_creation: 4000,
+                cache_read: 3000,
+            },
             Some("2025-06-15T10:00:00Z".into()),
             Some("2025-06-15T12:00:00Z".into()),
         );

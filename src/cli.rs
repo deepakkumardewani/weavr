@@ -441,6 +441,8 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
     let mut global_tokens: u64 = 0;
     let mut global_input_tokens: u64 = 0;
     let mut global_output_tokens: u64 = 0;
+    let mut global_cache_creation_tokens: u64 = 0;
+    let mut global_cache_read_tokens: u64 = 0;
     let mut global_earliest: Option<String> = None;
     let mut global_latest: Option<String> = None;
     let mut total_exported: usize = 0;
@@ -457,6 +459,8 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
         let mut project_tokens: u64 = 0;
         let mut project_input_tokens: u64 = 0;
         let mut project_output_tokens: u64 = 0;
+        let mut project_cache_creation_tokens: u64 = 0;
+        let mut project_cache_read_tokens: u64 = 0;
         let mut project_last_activity: Option<String> = None;
 
         for sf in &project.sessions {
@@ -607,6 +611,8 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
             project_tokens += total_session_tokens;
             project_input_tokens += input_tok;
             project_output_tokens += output_tok;
+            project_cache_creation_tokens += cache_create;
+            project_cache_read_tokens += cache_read;
 
             // Track per-project last activity.
             if let Some(ref ts) = last_ts {
@@ -668,6 +674,8 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
         global_tokens += project_tokens;
         global_input_tokens += project_input_tokens;
         global_output_tokens += project_output_tokens;
+        global_cache_creation_tokens += project_cache_creation_tokens;
+        global_cache_read_tokens += project_cache_read_tokens;
     }
 
     // Master index.
@@ -675,7 +683,13 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
         css,
         all_project_data,
         global_messages,
-        global_tokens,
+        crate::render::index::TokenTotals {
+            total: global_tokens,
+            input: global_input_tokens,
+            output: global_output_tokens,
+            cache_creation: global_cache_creation_tokens,
+            cache_read: global_cache_read_tokens,
+        },
         global_earliest,
         global_latest,
     );
@@ -693,12 +707,20 @@ fn run_all_projects(cli: Cli) -> anyhow::Result<()> {
     );
     println!();
     println!("  {}  HTML ({mode})", dim("Format:  "));
+    println!(
+        "  {}  {}",
+        dim("Sessions:"),
+        fmt_num(u64::try_from(total_exported).unwrap_or(u64::MAX))
+    );
     println!("  {}  {}", dim("Messages:"), fmt_num(u64::from(global_messages)));
     println!(
-        "  {}  {} in / {} out",
+        "  {}  {} ({} in + {} out + {} cache read + {} cache write)",
         dim("Tokens:  "),
+        fmt_tokens(global_tokens),
         fmt_tokens(global_input_tokens),
-        fmt_tokens(global_output_tokens)
+        fmt_tokens(global_output_tokens),
+        fmt_tokens(global_cache_read_tokens),
+        fmt_tokens(global_cache_creation_tokens)
     );
     println!("  {}  {}", dim("Took:    "), cyan(&fmt_elapsed(t0.elapsed())));
 
@@ -883,7 +905,9 @@ fn cyan(s: &str) -> String {
 }
 
 fn fmt_tokens(n: u64) -> String {
-    if n >= 1_000_000 {
+    if n >= 1_000_000_000 {
+        format!("{:.1}B", n as f64 / 1_000_000_000.0)
+    } else if n >= 1_000_000 {
         let m = n as f64 / 1_000_000.0;
         if m >= 10.0 {
             format!("{m:.1}M")

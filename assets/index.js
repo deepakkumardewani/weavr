@@ -391,6 +391,36 @@
   }
 
   // -----------------------------------------------------------------------
+  // Tooltip (data-tooltip attribute)
+  // -----------------------------------------------------------------------
+
+  function initTooltip() {
+    var tip = document.createElement('div');
+    tip.className = 'weavr-tooltip';
+    tip.hidden = true;
+    document.body.appendChild(tip);
+
+    document.addEventListener('mouseover', function (e) {
+      var target = e.target.closest('[data-tooltip]');
+      if (!target) return;
+      tip.textContent = target.getAttribute('data-tooltip');
+      tip.hidden = false;
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (tip.hidden) return;
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top  = (e.clientY + 12) + 'px';
+    });
+
+    document.addEventListener('mouseout', function (e) {
+      var target = e.target.closest('[data-tooltip]');
+      if (!target) return;
+      tip.hidden = true;
+    });
+  }
+
+  // -----------------------------------------------------------------------
   // Boot
   // -----------------------------------------------------------------------
 
@@ -404,6 +434,7 @@
     initSearch();
     initDateFilter();
     initThemeToggle();
+    initTooltip();
   }
 
   if (document.readyState === 'loading') {

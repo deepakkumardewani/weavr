@@ -7,6 +7,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![100% local](https://img.shields.io/badge/100%25%20local-no%20AI-brightgreen.svg)]()
 
+**Demo:** [https://wea-vr.vercel.app/](https://wea-vr.vercel.app/)
+
 A fast, self-contained Rust CLI that converts Claude Code transcript JSONL files into beautiful HTML and Markdown.
 
 `weavr` is a Rust reimplementation of [claude-code-log](https://github.com/daaain/claude-code-log), focused on speed, zero-dependency output artefacts, and a clean Material 3 design.
