@@ -1,6 +1,6 @@
 [package]
 name = "weavr"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 rust-version = "1.80"
 description = "Claude Code transcript exporter — beautiful, self-contained HTML and Markdown"

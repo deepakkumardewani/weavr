@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0] — 2026-07-10
+
+### Added
+
+- Cache token breakdown in CLI summary and master index page (input / output / cache read / cache write)
+- Tooltip UI (`data-tooltip` attribute) for token stat labels
+- Favicon assets
+
+### Changed
+
+- `fmt_tokens` now formats billions (e.g. `1.2B`) for very large token counts
+
+---
+
 ## [1.1.0] — 2026-06-12
 
 ### Added
